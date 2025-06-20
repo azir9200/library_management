@@ -9,7 +9,7 @@ const createBook = async (req: Request, res: Response) => {
 
     res.send({
       success: true,
-      message: "Mango Created Successfully",
+      message: "Book Created Successfully",
       data,
     });
   } catch (error) {
