@@ -5,7 +5,18 @@ const bookSchema = new Schema<IBook>(
   {
     title: { type: String, trim: true, required: true },
     author: { type: String, trim: true, required: true },
-    genre: String,
+    genre: {
+      type: String,
+      enum: [
+        "FICTION",
+        "NON_FICTION",
+        "SCIENCE",
+        "HISTORY",
+        "BIOGRAPHY",
+        "FANTASY",
+      ],
+      required: true,
+    },
     isbn: { type: Number, min: 0, required: true },
     copies: { type: Number, min: 0, required: true },
     description: { type: String },
@@ -14,12 +25,10 @@ const bookSchema = new Schema<IBook>(
   { timestamps: true }
 );
 
-const Book = model<IBook>("Book", bookSchema);
-export default Book;
+// bookSchema.methods.updateAvailability = function () {
+//   this.available = this.copies > 0;
+// };
 
-// genre: { type: String, enum: ["FICTION"
-// | "NON_FICTION"
-// | "SCIENCE"
-// | "HISTORY"
-// | "BIOGRAPHY"
-// | "FANTASY"], required: true },
+const Book = model<IBook>("Book", bookSchema);
+
+export default Book;

@@ -23,10 +23,25 @@ const createBook = async (req: Request, res: Response) => {
 
 const getBooks = async (req: Request, res: Response) => {
   try {
-    const data = await Book.find();
+    const {
+      filter,
+      sortBy = "createdAt",
+      sort = "desc",
+      limit = "10",
+    } = req.query;
+
+    const query: any = {};
+    if (filter) {
+      query.genre = filter;
+    }
+
+    const sortOrder = sort === "asc" ? 1 : -1;
+    const data = await Book.find(query)
+      .sort({ [sortBy as string]: sortOrder })
+      .limit(parseInt(limit as string));
     res.send({
       success: true,
-      message: "Book getting Successfully",
+      message: "Books retrieved successfully",
       data,
     });
   } catch (error) {
@@ -38,52 +53,14 @@ const getBooks = async (req: Request, res: Response) => {
   }
 };
 
-// const getBookById = async (req: Request, res: Response) => {
-//   try {
-//     const bookId = req.params.id;
-//     console.log("Book ID:", bookId);
-
-//     if (!mongoose.Types.ObjectId.isValid(bookId)) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Invalid book ID format",
-//       });
-//     }
-
-//     const data = await Book.findById(bookId);
-//     console.log("Book Data:", data);
-
-//     if (!data) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Book not found",
-//       });
-//     }
-
-//     res.status(200).json({
-//       success: true,
-//       message: "Book retrieved successfully",
-//       data,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: "Server error",
-//       error: error instanceof Error ? error.message : error,
-//     });
-//   }
-// };
-
 const getBookById = async (req: Request, res: Response) => {
   try {
     const bookId = req.params.bookId;
-    console.log("paga", req.params);
-    console.log("isssd", bookId);
+    
     const data = await Book.findById(bookId);
-    console.log("data bok", data);
     res.send({
       success: true,
-      message: "Book getting Successfully",
+      message: "Books retrieved successfully",
       data,
     });
   } catch (error) {
@@ -124,7 +101,7 @@ const deleteBookById = async (req: Request, res: Response) => {
   res.send({
     success: true,
     message: "Book deleted Successfully",
-    data,
+    data: null,
   });
 };
 

@@ -1,11 +1,9 @@
 export interface IBook {
   title: string;
   author: string;
-  genre:  string;
+  genre: "FICTION" | "NON_FICTION" | "SCIENCE" | "HISTORY" | "BIOGRAPHY" | "FANTASY";
   isbn: number;
   description : string;
   copies: number;
   available: boolean;
 }
-
-//  genre:  "FICTION" | "NON_FICTION" | "SCIENCE" | "HISTORY" | "BIOGRAPHY" | "FANTASY";

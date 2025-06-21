@@ -3,7 +3,7 @@ import { bookController } from "./book.controller";
 
 const bookRoute = Router();
 
-bookRoute.post("/create", bookController.createBook);
+bookRoute.post("/", bookController.createBook);
 bookRoute.get("/", bookController.getBooks);
 bookRoute.get("/:bookId", bookController.getBookById);
 bookRoute.patch("/:bookId", bookController.updateBook);
