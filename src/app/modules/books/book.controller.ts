@@ -1,21 +1,21 @@
 import { Request, Response } from "express";
 import Book from "./book.model";
-import mongoose from "mongoose";
+import { error } from "console";
+import { Error } from "mongoose";
 
 const createBook = async (req: Request, res: Response) => {
   try {
     const data = await Book.create(req.body);
-    console.log("book cont", req.body);
 
     res.send({
       success: true,
       message: "Book Created Successfully",
       data,
     });
-  } catch (error) {
+  } catch (error: any) {
     res.send({
       success: false,
-      message: "Error Happened",
+      message: error.message,
       error,
     });
   }
@@ -56,8 +56,15 @@ const getBooks = async (req: Request, res: Response) => {
 const getBookById = async (req: Request, res: Response) => {
   try {
     const bookId = req.params.bookId;
-    
+
     const data = await Book.findById(bookId);
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: "Book not found",
+        error: "No book exists with the given ID",
+      });
+    }
     res.send({
       success: true,
       message: "Books retrieved successfully",
@@ -75,7 +82,15 @@ const getBookById = async (req: Request, res: Response) => {
 const updateBook = async (req: Request, res: Response) => {
   try {
     const bookId = req.params.bookId;
-
+    const book = await Book.findById(bookId);
+    if (!book) {
+      return res.status(404).json({
+        success: false,
+        message: "Book not found",
+        error: "No book exists with the given ID",
+      });
+    }
+  
     const data = await Book.findByIdAndUpdate(bookId, req.body, {
       new: true,
       runValidators: true,
@@ -98,6 +113,14 @@ const deleteBookById = async (req: Request, res: Response) => {
   const bookId = req.params.bookId;
 
   const data = await Book.findByIdAndDelete(bookId);
+if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: "Book not found",
+        error: "No book exists with the given ID",
+      });
+    }
+
   res.send({
     success: true,
     message: "Book deleted Successfully",

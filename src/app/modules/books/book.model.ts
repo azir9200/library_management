@@ -25,6 +25,9 @@ const bookSchema = new Schema<IBook>(
   { timestamps: true }
 );
 
+bookSchema.statics.findAvailable = function () {
+  return this.find({ available: true });
+};
 
 const Book = model<IBook>("Book", bookSchema);
 

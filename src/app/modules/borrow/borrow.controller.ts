@@ -3,34 +3,37 @@ import Borrow from "./borrow.model";
 import Book from "../books/book.model";
 
 const createBorrow = async (req: Request, res: Response) => {
-  const { bookId, quantity, dueDate } = req.body;
+  const { book, quantity, dueDate } = req.body;
   console.log("body", req.body);
   try {
-    const book = await Book.findById(bookId);
-    console.log("book", book);
-    if (!book) {
-      throw new Error("Book not found !");
+    const bookExist = await Book.findById(book);
+    console.log("book", bookExist);
+    if (!bookExist) {
+      return res.status(404).json({
+        success: false,
+        message: "Book not found!",
+      });
     }
-    if (book.copies < quantity) {
-      throw new Error("Book not enough to borrow");
+    if (bookExist.copies < quantity) {
+      return res.status(400).json({
+        success: false,
+        message: "Not enough copies available to borrow.",
+      });
     }
     //   book.copies -= quantity;
-    book.copies = book?.copies - quantity;
+    bookExist.copies = bookExist?.copies - quantity;
 
-    if (book?.copies == 0) {
-      book.available = false;
+    if (bookExist?.copies === 0) {
+      bookExist.available = false;
     }
     console.log("book", book);
-    await book.save();
+    await bookExist.save();
     // const data = await Borrow.create(req.body);
     const data = await Borrow.create({
-      book: bookId,
+      book: book,
       quantity: quantity,
       dueDate: dueDate,
     });
-
-    console.log("data", data);
-    console.log("borrow cont", req.body);
 
     res.send({
       success: true,
@@ -38,10 +41,17 @@ const createBorrow = async (req: Request, res: Response) => {
       data,
     });
   } catch (error: any) {
-    res.send({
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        message: "Validation failed",
+        success: false,
+        error,
+      });
+    }
+    res.status(500).json({
+      message: "Internal server error",
       success: false,
-      message: error.message as string,
-      error,
+      error: error.message || error,
     });
   }
 };
@@ -69,11 +79,11 @@ export const getBorrowBook = async (req: Request, res: Response) => {
       {
         $project: {
           _id: 0,
-          totalQuantity: 1,
           book: {
             title: "$book.title",
             isbn: "$book.isbn",
           },
+          totalQuantity: 1,
         },
       },
     ]);
@@ -91,24 +101,6 @@ export const getBorrowBook = async (req: Request, res: Response) => {
     });
   }
 };
-
-// const getBorrowBook = async (req: Request, res: Response) => {
-//   try {
-//     const data = await Borrow.find();
-
-//     res.send({
-//       success: true,
-//       message: "Borrowed books summary retrieved successfully",
-//       data,
-//     });
-//   } catch (error) {
-//     res.send({
-//       success: true,
-//       message: "Error",
-//       error,
-//     });
-//   }
-// };
 
 export const borrowController = {
   createBorrow,
