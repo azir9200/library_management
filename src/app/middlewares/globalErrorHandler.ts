@@ -1,21 +1,38 @@
-import { ErrorRequestHandler, RequestHandler } from "express";
-import config from "../config";
+import {
+  ErrorRequestHandler,
+  NextFunction,
+  Request,
+  RequestHandler,
+  Response,
+} from "express";
 
 export const notFoundHandler: RequestHandler = (req, res, next) => {
   res.status(404).json({
     success: false,
-    message: `🔍 Not Found: ${req.originalUrl}`,
+    message: `🔍Api Not Found: ${req.originalUrl}`,
   });
 };
 
 //Global Error Handler
-export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal Server Error !";
+export const errorHandler: ErrorRequestHandler = (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const statusCode = err.statusCode || 400;
 
-  res.status(statusCode).json({
+  const errorResponse = {
+    message: "Validation failed",
     success: false,
-    message,
-    stack: config.node_env === "development" ? err.stack : undefined,
+    error: err,
+    next,
+  };
+
+  // Other errors
+  res.status(500).json({
+    message: "Internal server error",
+    success: false,
+    error: err.message || err,
   });
 };

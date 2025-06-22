@@ -19,10 +19,10 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Welcome to server site !");
 });
 
-// 404 Not Found handler (must be after all routes)
+// Found handler
 app.use(notFoundHandler);
 
-// Global Error handler (must be last)
+// Global Error handler 
 app.use(errorHandler);
 
 export default app;

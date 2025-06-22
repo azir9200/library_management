@@ -37,7 +37,7 @@ const createBorrow = async (req: Request, res: Response) => {
       message: "Book Borrow Successfully",
       data,
     });
-  } catch (error) {
+  } catch (error: any) {
     res.send({
       success: false,
       message: error.message as string,
@@ -46,24 +46,69 @@ const createBorrow = async (req: Request, res: Response) => {
   }
 };
 
-const getBorrowBook = async (req: Request, res: Response) => {
+export const getBorrowBook = async (req: Request, res: Response) => {
   try {
-    const data = await Borrow.find();
-    console.log("data", data);
+    const data = await Borrow.aggregate([
+      {
+        $group: {
+          _id: "$book",
+          totalQuantity: { $sum: "$quantity" },
+        },
+      },
+      {
+        $lookup: {
+          from: "books",
+          localField: "_id",
+          foreignField: "_id",
+          as: "book",
+        },
+      },
+      {
+        $unwind: "$book",
+      },
+      {
+        $project: {
+          _id: 0,
+          totalQuantity: 1,
+          book: {
+            title: "$book.title",
+            isbn: "$book.isbn",
+          },
+        },
+      },
+    ]);
 
-    res.send({
+    res.status(200).json({
       success: true,
       message: "Borrowed books summary retrieved successfully",
       data,
     });
   } catch (error) {
-    res.send({
-      success: true,
-      message: "Error",
-      error,
+    res.status(500).json({
+      success: false,
+      message: "Failed to retrieve borrowed books summary",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
+
+// const getBorrowBook = async (req: Request, res: Response) => {
+//   try {
+//     const data = await Borrow.find();
+
+//     res.send({
+//       success: true,
+//       message: "Borrowed books summary retrieved successfully",
+//       data,
+//     });
+//   } catch (error) {
+//     res.send({
+//       success: true,
+//       message: "Error",
+//       error,
+//     });
+//   }
+// };
 
 export const borrowController = {
   createBorrow,
