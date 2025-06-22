@@ -7,12 +7,5 @@ const routes = Router();
 routes.use("/books", bookRoute);
 routes.use("/borrow", borrowRoute);
 
-// const moduleRoutes = [
-//   {
-//     path: "/book",
-//     route: bookRoutes,
-//   },
-// ];
-// moduleRoutes.forEach((route) => router.use(route.path, route.route));
 
 export default routes;

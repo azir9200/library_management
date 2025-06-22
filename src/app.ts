@@ -16,13 +16,12 @@ app.use("/api", routes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send({ success: true, message: `Server is Live ⚡` });
-  res.send("Welcome to server site !");
 });
 
 // Found handler
 app.use(notFoundHandler);
 
-// Global Error handler 
+// Global Error handler
 app.use(errorHandler);
 
 export default app;

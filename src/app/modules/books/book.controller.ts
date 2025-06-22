@@ -58,12 +58,8 @@ const getBookById = async (req: Request, res: Response) => {
     const bookId = req.params.bookId;
 
     const data = await Book.findById(bookId);
-    if (!data) {
-      return res.status(404).json({
-        success: false,
-        message: "Book not found",
-        error: "No book exists with the given ID",
-      });
+    if(!data){
+      throw new Error( "book not fount")
     }
     res.send({
       success: true,
@@ -83,14 +79,10 @@ const updateBook = async (req: Request, res: Response) => {
   try {
     const bookId = req.params.bookId;
     const book = await Book.findById(bookId);
+    console.log("book", book);
     if (!book) {
-      return res.status(404).json({
-        success: false,
-        message: "Book not found",
-        error: "No book exists with the given ID",
-      });
+      throw new Error("Book not found !");
     }
-  
     const data = await Book.findByIdAndUpdate(bookId, req.body, {
       new: true,
       runValidators: true,
@@ -113,14 +105,6 @@ const deleteBookById = async (req: Request, res: Response) => {
   const bookId = req.params.bookId;
 
   const data = await Book.findByIdAndDelete(bookId);
-if (!data) {
-      return res.status(404).json({
-        success: false,
-        message: "Book not found",
-        error: "No book exists with the given ID",
-      });
-    }
-
   res.send({
     success: true,
     message: "Book deleted Successfully",

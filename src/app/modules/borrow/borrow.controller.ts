@@ -4,31 +4,25 @@ import Book from "../books/book.model";
 
 const createBorrow = async (req: Request, res: Response) => {
   const { book, quantity, dueDate } = req.body;
-  console.log("body", req.body);
+
   try {
     const bookExist = await Book.findById(book);
-    console.log("book", bookExist);
+  
     if (!bookExist) {
-      return res.status(404).json({
-        success: false,
-        message: "Book not found!",
-      });
+      throw new Error("Book not found !");
     }
     if (bookExist.copies < quantity) {
-      return res.status(400).json({
-        success: false,
-        message: "Not enough copies available to borrow.",
-      });
+      throw new Error("Book not enough to borrow");
     }
-    //   book.copies -= quantity;
+
     bookExist.copies = bookExist?.copies - quantity;
 
-    if (bookExist?.copies === 0) {
+    if (bookExist?.copies == 0) {
       bookExist.available = false;
     }
-    console.log("book", book);
+
     await bookExist.save();
-    // const data = await Borrow.create(req.body);
+
     const data = await Borrow.create({
       book: book,
       quantity: quantity,
@@ -41,63 +35,29 @@ const createBorrow = async (req: Request, res: Response) => {
       data,
     });
   } catch (error: any) {
-    if (error.name === "ValidationError") {
-      return res.status(400).json({
-        message: "Validation failed",
-        success: false,
-        error,
-      });
-    }
-    res.status(500).json({
-      message: "Internal server error",
+    res.send({
       success: false,
-      error: error.message || error,
+      message: error.message as string,
+      error,
     });
   }
 };
 
-export const getBorrowBook = async (req: Request, res: Response) => {
+const getBorrowBook = async (req: Request, res: Response) => {
   try {
-    const data = await Borrow.aggregate([
-      {
-        $group: {
-          _id: "$book",
-          totalQuantity: { $sum: "$quantity" },
-        },
-      },
-      {
-        $lookup: {
-          from: "books",
-          localField: "_id",
-          foreignField: "_id",
-          as: "book",
-        },
-      },
-      {
-        $unwind: "$book",
-      },
-      {
-        $project: {
-          _id: 0,
-          book: {
-            title: "$book.title",
-            isbn: "$book.isbn",
-          },
-          totalQuantity: 1,
-        },
-      },
-    ]);
+    const data = await Borrow.find();
+    console.log("data", data);
 
-    res.status(200).json({
+    res.send({
       success: true,
       message: "Borrowed books summary retrieved successfully",
       data,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to retrieve borrowed books summary",
-      error: error instanceof Error ? error.message : error,
+    res.send({
+      success: true,
+      message: "Error",
+      error,
     });
   }
 };
