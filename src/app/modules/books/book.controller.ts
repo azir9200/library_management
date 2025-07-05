@@ -58,8 +58,8 @@ const getBookById = async (req: Request, res: Response) => {
     const bookId = req.params.bookId;
 
     const data = await Book.findById(bookId);
-    if(!data){
-      throw new Error( "book not fount")
+    if (!data) {
+      throw new Error("book not fount");
     }
     res.send({
       success: true,
@@ -104,12 +104,32 @@ const updateBook = async (req: Request, res: Response) => {
 const deleteBookById = async (req: Request, res: Response) => {
   const bookId = req.params.bookId;
 
-  const data = await Book.findByIdAndDelete(bookId);
-  res.send({
-    success: true,
-    message: "Book deleted Successfully",
-    data: null,
-  });
+  try {
+    const updatedBook = await Book.findByIdAndUpdate(
+      bookId,
+      { isDeleted: true },
+      { new: true }
+    );
+
+    if (!updatedBook) {
+      return res.status(404).json({
+        success: false,
+        message: "Book not found",
+      });
+    }
+
+    res.send({
+      success: true,
+      message: "Book soft deleted successfully",
+      data: null,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error,
+    });
+  }
 };
 
 export const bookController = {

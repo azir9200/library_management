@@ -14,13 +14,19 @@ const bookSchema = new Schema<IBook>(
         "HISTORY",
         "BIOGRAPHY",
         "FANTASY",
+        "ROMANCE",
       ],
       required: true,
     },
     isbn: { type: Number, min: 0, required: true },
     copies: { type: Number, min: 0, required: true },
+    image: { type: String, required: true },
     description: { type: String },
     available: { type: Boolean, required: true },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
