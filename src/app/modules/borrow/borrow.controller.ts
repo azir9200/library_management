@@ -7,7 +7,7 @@ const createBorrow = async (req: Request, res: Response) => {
 
   try {
     const bookExist = await Book.findById(book);
-  
+
     if (!bookExist) {
       throw new Error("Book not found !");
     }
@@ -45,7 +45,7 @@ const createBorrow = async (req: Request, res: Response) => {
 
 const getBorrowBook = async (req: Request, res: Response) => {
   try {
-    const data = await Borrow.find();
+    const data = await Borrow.find().populate("book");
     console.log("data", data);
 
     res.send({

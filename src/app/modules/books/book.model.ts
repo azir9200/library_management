@@ -22,7 +22,7 @@ const bookSchema = new Schema<IBook>(
     copies: { type: Number, min: 0, required: true },
     image: { type: String, required: true },
     description: { type: String },
-    available: { type: Boolean, required: true },
+    available: { type: Boolean, required: true, default: true },
     isDeleted: {
       type: Boolean,
       default: false,

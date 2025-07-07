@@ -5,6 +5,6 @@ import { borrowController } from "./borrow.controller";
 const borrowRoute = Router();
 
 borrowRoute.post("/", borrowController.createBorrow);
-borrowRoute.get("/", borrowController.getBorrowBook);
+borrowRoute.get("/borrow-summary", borrowController.getBorrowBook);
 
 export default borrowRoute;
