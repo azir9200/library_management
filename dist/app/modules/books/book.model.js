@@ -13,13 +13,19 @@ const bookSchema = new mongoose_1.Schema({
             "HISTORY",
             "BIOGRAPHY",
             "FANTASY",
+            "ROMANCE",
         ],
         required: true,
     },
     isbn: { type: Number, min: 0, required: true },
     copies: { type: Number, min: 0, required: true },
+    image: { type: String, required: true },
     description: { type: String },
-    available: { type: Boolean, required: true },
+    available: { type: Boolean, required: true, default: true },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+    },
 }, { timestamps: true });
 bookSchema.statics.findAvailable = function () {
     return this.find({ available: true });

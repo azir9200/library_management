@@ -59,7 +59,7 @@ const getBooks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const getBookById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const bookId = req.params.bookId;
+        const bookId = req.params.id;
         const data = yield book_model_1.default.findById(bookId);
         if (!data) {
             throw new mongoose_1.Error("book not fount");
@@ -80,7 +80,8 @@ const getBookById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 const updateBook = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const bookId = req.params.bookId;
+        const bookId = req.params.id;
+        console.log(req.params);
         const book = yield book_model_1.default.findById(bookId);
         console.log("book", book);
         if (!book) {
@@ -99,19 +100,30 @@ const updateBook = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         res.send({
             success: false,
-            message: "Error",
+            message: error.message,
             error,
         });
     }
 });
 const deleteBookById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const bookId = req.params.bookId;
-    const data = yield book_model_1.default.findByIdAndDelete(bookId);
-    res.send({
-        success: true,
-        message: "Book deleted Successfully",
-        data: null,
-    });
+    const bookId = req.params.id;
+    console.log("object id", bookId);
+    try {
+        const updatedBook = yield book_model_1.default.findByIdAndUpdate(bookId, { isDeleted: true }, { new: true });
+        console.log("object updated", updatedBook);
+        res.send({
+            success: true,
+            message: "Book  deleted successfully",
+            data: null,
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error,
+        });
+    }
 });
 exports.bookController = {
     createBook,

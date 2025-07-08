@@ -51,8 +51,35 @@ const createBorrow = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 const getBorrowBook = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield borrow_model_1.default.find();
-        console.log("data", data);
+        const data = yield borrow_model_1.default.aggregate([
+            {
+                $group: {
+                    _id: "$book",
+                    totalBorrowed: { $sum: "$quantity" },
+                },
+            },
+            {
+                $lookup: {
+                    from: "books",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "bookDetails",
+                },
+            },
+            {
+                $unwind: "$bookDetails",
+            },
+            {
+                $project: {
+                    _id: 0,
+                    title: "$bookDetails.title",
+                    isbn: "$bookDetails.isbn",
+                    totalBorrowed: 1,
+                },
+            },
+        ]);
+        console.log("object summery", data);
+        // ......
         res.send({
             success: true,
             message: "Borrowed books summary retrieved successfully",

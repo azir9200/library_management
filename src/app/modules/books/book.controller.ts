@@ -104,15 +104,15 @@ const updateBook = async (req: Request, res: Response) => {
 };
 
 const deleteBookById = async (req: Request, res: Response) => {
-  const bookId = req.params.bookId;
-
+  const bookId = req.params.id;
+  console.log("object id", bookId);
   try {
     const updatedBook = await Book.findByIdAndUpdate(
       bookId,
       { isDeleted: true },
       { new: true }
     );
-
+    console.log("object updated", updatedBook);
     res.send({
       success: true,
       message: "Book  deleted successfully",

@@ -45,9 +45,37 @@ const createBorrow = async (req: Request, res: Response) => {
 
 const getBorrowBook = async (req: Request, res: Response) => {
   try {
-    const data = await Borrow.find().populate("book");
-    console.log("data", data);
+    const data = await Borrow.aggregate([
+      {
+        $group: {
+          _id: "$book",
+          totalBorrowed: { $sum: "$quantity" },
+        },
+      },
+      {
+        $lookup: {
+          from: "books",
+          localField: "_id",
+          foreignField: "_id",
+          as: "bookDetails",
+        },
+      },
+      {
+        $unwind: "$bookDetails",
+      },
+      {
+        $project: {
+          _id: 0,
+          title: "$bookDetails.title",
+          isbn: "$bookDetails.isbn",
+          totalBorrowed: 1,
+        },
+      },
+    ]);
 
+    console.log("object summery", data);
+
+    // ......
     res.send({
       success: true,
       message: "Borrowed books summary retrieved successfully",
